@@ -1,2 +1,2 @@
 # Catghost-Terminal
-A terminal similar to linux
+This is a terminal if you don't have one (which is almost impossible)
