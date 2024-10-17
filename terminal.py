@@ -362,6 +362,14 @@ def unmount_device(mount_point):
     else:
         print("Root privileges required to unmount device.")
 
+def kill_process(pid):
+    if rooted:
+        try:
+            os.system(f"sudo kill {pid}")
+            print(f"Process {pid} killed.")
+        except Exception as e:
+            print(f"Error killing process {pid}: {e}")
+
 
 def display_help():
     print("""
@@ -465,22 +473,22 @@ def run_command(command):
     "txt--removetask": remove_task,
     "cur--convert": currency_converter,
     "sys--shutdown": system_shutdown,
-    "sys--flushdns": flush_dns,
-    "sys--adduser": add_user,
-    "sys--deluser": delete_user,
-    "sys--clearlogs": clear_syslog,
-    "sys--sethostname": set_hostname,
-    "sys--firewallstatus": firewall_status,
-    "sys--installpackage": install_package,
-    "sys--uninstallpackage": uninstall_package,
-    "sys--updaterepos": update_repositories,
-    "sys--upgradesystem": upgrade_system,
-    "sys--killprocess": kill_process,
-    "sys--changepermissions": change_permissions,
-    "sys--changeowner": change_owner,
-    "sys--mountdevice": mount_device,
-    "sys--unmountdevice": unmount_device,
-    "help": display_help
+    "root--flushdns": flush_dns,
+    "root--adduser": add_user,
+    "root--deluser": delete_user,
+    "root--clearlogs": clear_syslog,
+    "root--sethostname": set_hostname,
+    "root--firewallstatus": firewall_status,
+    "root--installpackage": install_package,
+    "root--uninstallpackage": uninstall_package,
+    "root--updaterepos": update_repositories,
+    "root--upgradesystem": upgrade_system,
+    "root--killprocess": kill_process,
+    "root--changepermissions": change_permissions,
+    "root--changeowner": change_owner,
+    "root--mountdevice": mount_device,
+    "root--unmountdevice": unmount_device,
+    "root": display_help
 }
 
     command_parts = shlex.split(command)
