@@ -2,4 +2,3 @@ pip install rich
 pip install requests
 pip install bs4
 pip install psutil
-pip install qrcode
