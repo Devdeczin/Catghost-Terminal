@@ -1,10 +1,11 @@
-from rich import print as rprint
+# Version: 1.0.0.0
+
+import sys
 import string
 import time
 import subprocess
 import requests
 from bs4 import BeautifulSoup
-import qrcode
 from rich.console import Console
 from rich.prompt import Prompt
 import os
@@ -12,10 +13,47 @@ import random
 import socket
 import psutil
 import shlex
+from rich.table import Table
+
+def gif_meme():
+    console.print("Welcome to [blue]gif search[/blue]!")
+    time.sleep(0.1)
+    console.print("Powered by: [blue]Tenor[/blue]")
+    API_KEY = console.input("Put your API key here (https://developers.google.com/tenor/guides/quickstart?authuser=2#python): ")
+    console.print("Ok, now, you can make a search!")
+    search = console.input("Put your search here: ")
+    api_key = API_KEY
+    url = 'https://tenor.googleapis.com/v2/search'
+    params = {
+        'q': search,  
+        'key': api_key, 
+        'limit': 5,  
+        'media_filter': 'minimal',
+    }
+    
+    response = requests.get(url, params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        for result in data['results']:
+            print(result['url'])
+    else:
+        console.print('[]Error:[/red]', response.status_code)
+
 
 rooted = False
 console = Console()
 
+def hacker_display(*args):
+    while True:
+        from ignoreme import hacker
+        hacker(*args)
+        if KeyboardInterrupt:
+            console.print("donkey trickster was stopped by Key board Interrupt")
+def insults():
+    from ignoreme import insult, insults_in_english, insults_in_portuguese
+    insult()
+        
 def enable_root():
     global rooted
     root_confirm = input("Confirm root? (y/n): ")
@@ -26,11 +64,18 @@ def enable_root():
         rooted = False
         print("Root disabled.")
 
+
 def show_ip():
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
     print(f"Hostname: {hostname}")
     print(f"IP Address: {ip_address}")
+
+def roll_dice(sides):
+    number = random.randint(1, sides)
+    print("Rolling the dice...")
+    time.sleep(1)
+    print("The dice landed on:", number)
 
 def list_files():
     files = os.listdir('.')
@@ -141,13 +186,6 @@ def currency_converter(value, from_currency, to_currency):
     except Exception as e:
         console.print("[bold red]Error when searching for exchange rate. Check the currency code.[/bold red]")
 
-def generate_qrcode(text):
-    qr = qrcode.QRCode()
-    qr.add_data(text)
-    qr.make(fit=True)
-    img = qr.make_image()
-    img.show()
-    console.print("[bold green]QR Code generated and displayed![/bold green]")
 
 def system_monitoring():
     cpu = psutil.cpu_percent(interval=1)
@@ -253,21 +291,7 @@ def whois_query(domain):
         print(f"WHOIS results for {domain}:\n{output}")
     except subprocess.CalledProcessError:
         print(f"Error performing WHOIS lookup for {domain}.")
-
-def install_package(package_name):
-    try:
-        os.system(f"sudo apt-get install -y {package_name}")
-        print(f"Package {package_name} installed successfully.")
-    except Exception as e:
-        print(f"Error installing package: {e}")
-
-def uninstall_package(package_name):
-    try:
-        os.system(f"sudo apt-get remove -y {package_name}")
-        print(f"Package {package_name} removed successfully.")
-    except Exception as e:
-        print(f"Error removing package: {e}")
-
+        
 def update_repositories():
     try:
         os.system("sudo apt-get update")
@@ -282,6 +306,7 @@ def upgrade_system():
     except Exception as e:
         print(f"Error upgrading packages: {e}")
 
+#rooted commands
 def flush_dns():
     if rooted:
         try:
@@ -352,6 +377,33 @@ def mount_device(device, mount_point):
     else:
         print("Root privileges required to mount device.")
 
+def install_package(package_name):
+    if rooted:
+        if package_name:
+            try:
+                subprocess.run(f"sudo apt-get install -y {package_name}", shell=True, check=True)
+                print(f"Package '{package_name}' installed successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error installing package: {e}")
+        else:
+            print("Please specify a package name.")
+    else:
+        print("Root privileges required to install a package.")
+
+def uninstall_package(package_name):
+    if rooted:
+        if package_name:
+            try:
+                subprocess.run(f"sudo apt-get remove -y {package_name}", shell=True, check=True)
+                print(f"Package '{package_name}' uninstalled successfully.")
+            except subprocess.CalledProcessError as e:
+                print(f"Error uninstalling package: {e}")
+        else:
+            print("Please specify a package name.")
+    else:
+        print("Root privileges required to uninstall a package.")
+
+
 def unmount_device(mount_point):
     if rooted:
         try:
@@ -366,10 +418,27 @@ def kill_process(pid):
     if rooted:
         try:
             os.system(f"sudo kill {pid}")
-            print(f"Process {pid} killed.")
+            print(f"Processo {pid} foi encerrado.")
         except Exception as e:
-            print(f"Error killing process {pid}: {e}")
+            print(f"Erro ao encerrar o processo {pid}: {e}")
+    else:
+        print("Privilegios de root são necessários para matar o processo.")
 
+def change_owner(user, file_path):
+    try:
+        os.system(f"sudo chown {user} {file_path}")
+        print(f"Ownership of {file_path} changed to {user}.")
+    except Exception as e:
+        print(f"Error changing ownership: {e}")
+
+def change_permissions(permissions, file_path):
+    try:
+        os.system(f"sudo chmod {permissions} {file_path}")
+        print(f"Permissions of {file_path} changed to {permissions}.")
+    except Exception as e:
+        print(f"Error changing permissions: {e}")
+
+# ===============================================================
 
 def display_help():
     print("""
@@ -398,8 +467,8 @@ Available commands:
     net--whois <domain>     Perform a WHOIS lookup.
     zip--compress <files> <output>   Compress files into a zip archive.
     zip--decompress <file>  Decompress a zip archive.
-    generate--password      Generate a random password.
-    generate--qrcode <text> Generate a QR Code from text.
+    grn--password           Generate a random password.
+    grn--qrcode <text>      Generate a QR Code from text.
     sys--monitor            Display system CPU and memory usage.
     task--add               Add a task to the task list.
     task--list              List all tasks.
@@ -407,6 +476,13 @@ Available commands:
     help                    Display this help message.
     root--ROOT=true         Enable root privileges.
     root--ROOT=false        Disable root privileges.
+    fun--dice               Roll a dice.
+    fun--guess_number       Play a guessing game.
+    fun--hangman            Play a hangman game.
+    fun--ascii_art          Display ASCII art.
+    fun--meme               Display a random meme.
+    fun--hacker             Display a hacker-themed message.
+    fun--insult             Display a random insult (don't use it for evil ;)).
     shutdown                Shutdown the system.
 
 Rooted commands:
@@ -423,8 +499,9 @@ Rooted commands:
     root--deluser <username>             Remove a user from the system.
     root--clearsyslog                    Clear the system logs.
     root--sethostname <new_hostname>     Change the hostname of the system.
-    root--firewallstatus                 Check the status of the system firewall.   
-    
+    root--firewallstatus                 Check the status of the system firewall. 
+    root                                 Display this help message.
+
 Prefixes:
     fun--       Just have fun in games or functions.
     py--        Use for python-related things.
@@ -435,6 +512,7 @@ Prefixes:
     zip--       File compression/decompression.
     generate--  Generate passwords, QR codes, etc.
     task--      Task management commands.
+    fun--       Fun commands (I don't know how much fun you're going to have with text).
     root--      Root-related commands.
     cd          Change directory.
     """)
@@ -466,21 +544,25 @@ def run_command(command):
     "zip--compress": compress_files,
     "zip--decompress": decompress_files,
     "generate--password": generate_password,
-    "generate--qrcode": generate_qrcode,
     "sys--monitoring": system_monitoring,
     "txt--addtask": add_task,
     "txt--listtasks": list_tasks,
     "txt--removetask": remove_task,
     "cur--convert": currency_converter,
     "sys--shutdown": system_shutdown,
+    "fun--dice": roll_dice, 
+    "fun--insult": insults, 
+    "fun--hacker": hacker_display,
+    "fun--meme": gif_meme,
+    "root--ROOT=true": enable_root,
     "root--flushdns": flush_dns,
     "root--adduser": add_user,
     "root--deluser": delete_user,
     "root--clearlogs": clear_syslog,
     "root--sethostname": set_hostname,
     "root--firewallstatus": firewall_status,
-    "root--installpackage": install_package,
-    "root--uninstallpackage": uninstall_package,
+    "root--installpkg": install_package,
+    "root--uninstallpkg": uninstall_package,
     "root--updaterepos": update_repositories,
     "root--upgradesystem": upgrade_system,
     "root--killprocess": kill_process,
@@ -508,17 +590,17 @@ def run_command(command):
         print(f"Command '{command}' not found.")
 
 console.print('''
-CatghostOS terminal [[blue]Version: 0.0.0.1[/blue] BETA]
-   (©) CatghostOS made by Devdeczin
-   Powered by: [bold red]Fsociety[/bold red] 👩🏻‍💻 and [green]Linux Terminal[/green] 🐧
+[bold green]CatghostOS terminal[/bold green] [[blue]Version: 1.0.0.0[/blue]]
+   (©) [bold green]CatghostOS[/bold green] made by Devdeczin
+   Powered by: [bold red]Fsociety[/bold red] 👾 and [green]Linux Terminal[/green] 🐧
 ''')
 
 while True:
     usuario = os.getenv("USER") or os.getenv("USERNAME") or "???"
     if not rooted:
-        command = input(f"{usuario}@CatGhOSt> ")
+        command = console.input(f"[green]{usuario}@[/green][bold green]CatGhOSt[/bold green]> ")
     else:
-        command = input(f"ROOTEDMODE*{usuario}@CatGhOSt> ")
+        command = input(f"[bold red]ROOTenv[/bold red]~{usuario}@CatGhOSt> ").encode('utf-8').decode('utf-8', errors='ignore')
 
     if command.strip() == "help":
         display_help()
